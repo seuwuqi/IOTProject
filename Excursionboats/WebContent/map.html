@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<script type="text/javascript"
+	src="http://api.map.baidu.com/api?v=2.0&ak=u3FFtlfuXP6ArxfhqGafohGw7HEVcj9Q"></script>
+<style type="text/css">
+body, html {
+	width: 100%;
+	height: 95%;
+	margin: 0;
+	font-family: "微软雅黑";
+}
+
+#map_canvas {
+	width: 100%;
+	height: 100%;
+}
+</style>
+
+<script type="text/javascript">
+		function loadData() {
+			var xmlhttp;
+
+			if (window.XMLHttpRequest) {
+				// IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+				xmlhttp = new XMLHttpRequest();
+			} else {
+				// IE6, IE5 浏览器执行代码
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			xmlhttp.onreadystatechange = function() {
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+					map.clearOverlays();
+				    var json= JSON.parse(xmlhttp.responseText);
+				    for(var k in json ){
+				    	//alert(k + " " + json[k].longitude);
+				    	if (json[k].idboats == 200){
+				    		json[k].latitude += 0.002;
+				    	}
+				    	addMarker(new BMap.Point(json[k].longitude, json[k].latitude), json[k].idboats, json[k].event);
+				    }
+				    
+				}
+				else {
+					document.getElementById("txtHint").innerHTML = "No Response!";
+				}
+			};
+			xmlhttp.open("GET", "ReadStatusServlet", true);
+			xmlhttp.send();
+			
+		}
+</script>
+
+</head>
+<body>
+
+	<div id="map_canvas"></div>
+
+	<script>
+		var map = new BMap.Map('map_canvas');
+		
+		//初始化地图，设置中心点坐标和地图级别
+		map.addControl(new BMap.MapTypeControl()); //添加地图类型控件
+		map.addControl(new BMap.OverviewMapControl()); //添加缩略地图控件
+		map.addControl(new BMap.NavigationControl()); //添加地图缩放控件
+		map.addControl(new BMap.ScaleControl()); //添加比例尺控件
+		map.setCurrentCity("南京"); //设置地图显示的城市，这项是必须的
+		map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+		map.centerAndZoom(new BMap.Point(118.831508, 31.944003), 17);
+		
+
+		//var p = Math.ceil(PointArr.length / 2);
+		//map.centerAndZoom(new BMap.Point(PointArr[p].x, PointArr[p].y), 13);
+// 		var driving;
+// 		for ( var i in PointArr) {
+// 			if (i == 0) {
+// 				addMarker(new BMap.Point(PointArr[i].x, PointArr[i].y), "起点");
+// 				continue;
+// 			}
+// 			driving = new BMap.DrivingRoute(map, {
+// 				renderOptions : {
+// 					map : map,
+// 					autoViewport : false
+// 				},
+// 				onMarkersSet : function(routes) {
+// 					map.removeOverlay(routes[0].marker); //删除API自带起点  
+// 					map.removeOverlay(routes[1].marker); //删除API自带终点  
+// 				}
+// 			});
+// 			driving.search(
+// 					new BMap.Point(PointArr[i - 1].x, PointArr[i - 1].y),
+// 					new BMap.Point(PointArr[i].x, PointArr[i].y));
+// 			if (i == PointArr.length - 1) {
+// 				addMarker(new BMap.Point(PointArr[i].x, PointArr[i].y), "终点");
+// 			}
+// 		}
+		
+		loadData();
+		setInterval(loadData,1000);
+		
+		
+		/**  
+		 * 标记
+		 * @param {Object} point
+		 */
+		function addMarker(point, name, event) {
+			var marker = new BMap.Marker(point);
+			marker.setAnimation(BMAP_ANIMATION_DROP);
+			//marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+			if (event == "0") {
+				marker.setIcon(new BMap.Icon("normal_green.png", new BMap.Size(100,100)));
+			} else if (event == "1") {
+				marker.setIcon(new BMap.Icon("warning_flash_yellow.gif", new BMap.Size(100,100)));
+			} else if (event == "2") {
+				marker.setIcon(new BMap.Icon("accident_flash_red.gif", new BMap.Size(100,100)));
+			} else if (event == "3") {
+				marker.setIcon(new BMap.Icon("Help_flash.gif", new BMap.Size(200,200)));
+			} else if (event == "4") {
+				marker.setIcon(new BMap.Icon("collision_flash.gif", new BMap.Size(200,200)));
+			}
+			
+			var label = new BMap.Label(name, {
+				offset : new BMap.Size(20, -10)
+			});
+			marker.setLabel(label);
+			map.addOverlay(marker);
+		}
+	</script>
+
+
+
+	<div id="txtHint">...</div>
+
+
+</body>
+</html>

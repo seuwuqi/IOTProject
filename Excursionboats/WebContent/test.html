@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<script>
+	
+		//loadData();
+		//
+		function loadData() {
+			
+			document.getElementById("txtHint").innerHTML = "bbb";
+			var xmlhttp = null;
+			
+			if (window.XMLHttpRequest) {
+				// IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+				xmlhttp = new XMLHttpRequest();
+			} else {
+				// IE6, IE5 浏览器执行代码
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			document.getElementById("txtHint").innerHTML = "ccc";
+
+			
+			xmlhttp.open("GET", "test.txt", true);
+			xmlhttp.send();
+			
+			xmlhttp.onreadystatechange=function(){
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					document.getElementById("txtHint").innerHTML = xmlhttp.responseText;
+				}
+				else {
+					document.getElementById("txtHint").innerHTML = "Haha";
+				}
+			};
+		}
+	</script>
+</head>
+<body>
+	<div id="txtHint">客户信息将显示在这...</div>
+	<script type="text/javascript">
+	    document.getElementById("txtHint").innerHTML = "aadasdasa";
+	    
+		loadData();
+	</script>
+</body>
+</html>
